@@ -13,6 +13,7 @@ import re
 import struct
 import subprocess
 import sys
+import time
 import warnings
 
 from setuptools import Extension, setup
@@ -27,7 +28,19 @@ def get_version():
 
 
 NAME = "Pillow-SIMD"
-PILLOW_VERSION = get_version()
+
+
+def _check_add_criteo_environment(package_version):
+    # Check both cases because soon criteois.lan will change to crto.in
+    if "JENKINS_URL" in os.environ and "crto.in" in os.environ["JENKINS_URL"]:
+        return f"42.0+criteo.{int(time.time())}_Upst_{package_version}"
+
+    return package_version
+
+
+UPSTREAM_VERSION = get_version()
+PILLOW_VERSION = _check_add_criteo_environment(UPSTREAM_VERSION)
+
 FREETYPE_ROOT = None
 HARFBUZZ_ROOT = None
 FRIBIDI_ROOT = None
